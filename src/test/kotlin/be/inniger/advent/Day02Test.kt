@@ -24,13 +24,16 @@ class Day02Test {
 
     @Test
     fun validateFirstSolution() {
-        assertEquals(2894520, problem.solveFirst(setAlarmState(input)))
+        assertEquals(2894520, problem.solveFirst(input, 12, 2))
     }
 
-    private fun setAlarmState(program: IntArray): IntArray {
-        program[1] = 12
-        program[2] = 2
+    @Test
+    fun validateSecondSampleInputs() {
+        // No sample inputs given
+    }
 
-        return program
+    @Test
+    fun validateSecondSolution() {
+        assertEquals(9342, problem.solveSecond(input))
     }
 }

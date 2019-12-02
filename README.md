@@ -20,4 +20,3 @@ Tests verifying all solutions (and sample inputs) can be found under ["Test"](sr
 GNU GENERAL PUBLIC LICENSE version 3. See [LICENSE](LICENSE).
 
 _Copyright (C) 2019 Bram Inniger_
-

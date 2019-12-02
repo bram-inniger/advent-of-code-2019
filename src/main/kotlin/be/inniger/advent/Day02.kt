@@ -23,12 +23,15 @@ class Day02 {
 
     private fun runProgram(originalProgram: IntArray, noun: Int, verb: Int): Int {
         val program = originalProgram.copyOf()
+        var pointer = 0
 
         program[1] = noun
         program[2] = verb
 
-        for (pointer in program.indices step 4) {
-            when (OpCode.parse(program[pointer])) {
+        while (true) {
+            val opcode = OpCode.parse(program[pointer])
+
+            when (opcode) {
                 OpCode.ADD ->
                     program[program[pointer + 3]] = program[program[pointer + 1]] + program[program[pointer + 2]]
                 OpCode.MULTIPLY ->
@@ -36,15 +39,15 @@ class Day02 {
                 OpCode.HALT ->
                     return program[0]
             }
-        }
 
-        throw IllegalArgumentException("Invalid input that doesn't properly HALT")
+            pointer += opcode.nrInstructions
+        }
     }
 
-    private enum class OpCode {
-        ADD,
-        MULTIPLY,
-        HALT;
+    private enum class OpCode(val nrInstructions: Int) {
+        ADD(4),
+        MULTIPLY(4),
+        HALT(1);
 
         companion object {
             fun parse(opcode: Int) = when (opcode) {

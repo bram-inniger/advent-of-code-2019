@@ -2,18 +2,31 @@ package be.inniger.advent
 
 import kotlin.math.abs
 
+private typealias StepCount = Int
+
 class Day03 {
 
     fun solveFirst(firstWire: List<String>, secondWire: List<String>) =
-        followWire(firstWire)
-            .intersect(followWire(secondWire))
+        followWire(firstWire).keys
+            .intersect(followWire(secondWire).keys)
             .map { abs(it.x) + abs(it.y) }
             .min()!!
 
-    private fun followWire(wire: List<String>): Set<Position> {
+    fun solveSecond(firstWire: List<String>, secondWire: List<String>): StepCount {
+        val firstPositions = followWire(firstWire)
+        val secondPositions = followWire(secondWire)
+
+        return firstPositions.keys
+            .intersect(secondPositions.keys)
+            .map { firstPositions.getValue(it) + secondPositions.getValue(it) }
+            .min()!!
+    }
+
+    private fun followWire(wire: List<String>): Map<Position, StepCount> {
         var x = 0
         var y = 0
-        val positions = mutableSetOf<Position>()
+        var steps = 0
+        val positions = mutableMapOf<Position, StepCount>()
 
         for (movement in wire) {
             val direction = movement[0]
@@ -25,14 +38,14 @@ class Day03 {
                     'D' -> y--
                     'L' -> x--
                     'U' -> y++
-                    else -> throw IllegalArgumentException("Cannot parse direction: $direction")
+                    else -> error("Cannot parse direction: $direction")
                 }
 
-                positions.add(Position(x, y))
+                positions.putIfAbsent(Position(x, y), ++steps)
             }
         }
 
-        return positions.toSet()
+        return positions.toMap()
     }
 
     private data class Position(val x: Int, val y: Int)

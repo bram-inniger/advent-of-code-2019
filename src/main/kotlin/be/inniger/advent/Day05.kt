@@ -1,6 +1,6 @@
 package be.inniger.advent
 
-import kotlin.math.pow
+import be.inniger.advent.util.pow
 
 class Day05 {
 
@@ -23,7 +23,7 @@ class Day05 {
         while (true) {
             val instruction = program[pointer]
             val opcode = Opcode.parse(instruction % 100)
-            val arg = partialApply(::readArg, instruction, program, pointer)
+            val arg = { argIndex: Int -> (::readArg)(instruction, program, pointer, argIndex) }
 
             when (opcode) {
                 Opcode.ADD -> program[program[pointer + 3]] = arg(1) + arg(2)
@@ -41,10 +41,6 @@ class Day05 {
         }
     }
 
-    private fun <A, B, C, D, E> partialApply(f: (A, B, C, D) -> E, a: A, b: B, c: C): (D) -> E {
-        return { d: D -> f(a, b, c, d) }
-    }
-
     private fun readArg(instruction: Int, program: IntArray, pointer: Int, argIndex: Int) =
         if (computeMode(instruction, argIndex) == Mode.POSITION) program[program[pointer + argIndex]]
         else program[pointer + argIndex]
@@ -52,8 +48,6 @@ class Day05 {
     private fun computeMode(instruction: Int, argIndex: Int) =
         if (instruction / (10 * 10.pow(argIndex)) % 10 == 0) Mode.POSITION
         else Mode.IMMEDIATE
-
-    private fun Int.pow(power: Int) = this.toDouble().pow(power.toDouble()).toInt()
 
     private enum class Opcode(val instructionLength: Int) {
         ADD(4),

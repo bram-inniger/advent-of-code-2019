@@ -1,14 +1,37 @@
 package be.inniger.advent
 
-import java.util.ArrayDeque
+import kotlin.Int as Distance
+import kotlin.String as Body
+import kotlin.String as Description
+
+private fun <T> List<T>.head() = first()
+private fun <T> List<T>.tail() = drop(1)
 
 class Day06 {
 
     companion object {
         private const val CENTER_OF_MASS = "COM"
+        private const val YOU = "YOU"
+        private const val SANTA = "SAN"
     }
 
-    fun solveFirst(orbitDescriptions: List<String>): Int {
+    fun solveFirst(orbitDescriptions: List<Description>) =
+        mapOrbits(orbitDescriptions).distanceToCenter.map { it.value }.sum()
+
+    fun solveSecond(orbitDescriptions: List<Description>): Distance {
+        val (orbiterToOrbited, distanceToCenter) = mapOrbits(orbitDescriptions)
+
+        val yourDistanceToCenter = distanceToCenter.getValue(YOU) - 1
+        val santasDistanceToCenter = distanceToCenter.getValue(SANTA) - 1
+        val furthestCommonDistance = getOrbitPath(orbiterToOrbited, SANTA)
+            .intersect(getOrbitPath(orbiterToOrbited, YOU))
+            .map { distanceToCenter.getValue(it) }
+            .max()!!
+
+        return yourDistanceToCenter + santasDistanceToCenter - 2 * furthestCommonDistance
+    }
+
+    private fun mapOrbits(orbitDescriptions: List<Description>): MappedOrbits {
         val orbitRelations = orbitDescriptions.map { OrbitRelation.parse(it) }
         val orbitedToOrbiter = orbitRelations.groupBy(
             { relation -> relation.orbited },
@@ -18,29 +41,52 @@ class Day06 {
             { relation -> relation.orbited })
             .mapValues { it.value.single() }
 
-        val orbiterStack = ArrayDeque<String>()
-        val distanceToCenter = mutableMapOf<String, Int>()
+        val distanceToCenter = calculateDistancesToCenter(
+            orbitedToOrbiter,
+            orbiterToOrbited,
+            orbitedToOrbiter.getValue(CENTER_OF_MASS),
+            mapOf(CENTER_OF_MASS to 0)
+        )
 
-        orbitedToOrbiter.getValue(CENTER_OF_MASS).forEach { orbiterStack.push(it) }
-        distanceToCenter[CENTER_OF_MASS] = 0
-
-        while (orbiterStack.isNotEmpty()) {
-            val orbiter = orbiterStack.pop()
-            orbitedToOrbiter.getOrDefault(orbiter, listOf()).forEach { orbiterStack.push(it) }
-            distanceToCenter[orbiter] = distanceToCenter.getValue(orbiterToOrbited.getValue(orbiter)) + 1
-        }
-
-        return distanceToCenter.map { it.value }.sum()
+        return MappedOrbits(orbiterToOrbited, distanceToCenter)
     }
 
-    private data class OrbitRelation(val orbited: String, val orbiter: String) {
+    private tailrec fun calculateDistancesToCenter(
+        orbitedToOrbiter: Map<Body, List<Body>>,
+        orbiterToOrbited: Map<Body, Body>,
+        orbitersToVisit: List<Body>,
+        distancesToCenter: Map<Body, Distance>
+    ): Map<Body, Distance> =
+        if (orbitersToVisit.isEmpty()) distancesToCenter
+        else {
+            val orbiter = orbitersToVisit.head()
+            val orbitersToAdd = orbitedToOrbiter.getOrDefault(orbiter, listOf())
+            val distanceToCenter = distancesToCenter.getValue(orbiterToOrbited.getValue(orbiter)) + 1
+
+            calculateDistancesToCenter(
+                orbitedToOrbiter,
+                orbiterToOrbited,
+                orbitersToVisit.tail().plus(orbitersToAdd),
+                distancesToCenter.plus(orbiter to distanceToCenter)
+            )
+        }
+
+    private tailrec fun getOrbitPath(
+        orbiterToOrbited: Map<Body, Body>, orbiter: Body?, orbitPath: Set<Body> = setOf()
+    ): Set<Body> =
+        if (orbiter == null) orbitPath
+        else getOrbitPath(orbiterToOrbited, orbiterToOrbited[orbiter], orbitPath.plus(orbiter))
+
+    private data class OrbitRelation(val orbited: Body, val orbiter: Body) {
         companion object {
             private val regex = """^(\w+)\)(\w+)$""".toRegex()
 
-            fun parse(orbitDescription: String): OrbitRelation {
+            fun parse(orbitDescription: Description): OrbitRelation {
                 val (orbited, orbiter) = regex.find(orbitDescription)!!.destructured
                 return OrbitRelation(orbited, orbiter)
             }
         }
     }
+
+    private data class MappedOrbits(val orbiterToOrbited: Map<Body, Body>, val distanceToCenter: Map<Body, Distance>)
 }

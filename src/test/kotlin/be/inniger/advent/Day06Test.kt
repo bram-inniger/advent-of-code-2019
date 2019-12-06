@@ -35,4 +35,33 @@ class Day06Test {
     fun validateFirstSolution() {
         assertEquals(308790, problem.solveFirst(input))
     }
+
+    @Test
+    fun validateSecondSampleInputs() {
+        assertEquals(
+            4,
+            problem.solveSecond(
+                listOf(
+                    "COM)B",
+                    "B)C",
+                    "C)D",
+                    "D)E",
+                    "E)F",
+                    "B)G",
+                    "G)H",
+                    "D)I",
+                    "E)J",
+                    "J)K",
+                    "K)L",
+                    "K)YOU",
+                    "I)SAN"
+                )
+            )
+        )
+    }
+
+    @Test
+    fun validateSecondSolution() {
+        assertEquals(472, problem.solveSecond(input))
+    }
 }

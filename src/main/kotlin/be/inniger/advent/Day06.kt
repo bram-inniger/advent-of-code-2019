@@ -1,11 +1,10 @@
 package be.inniger.advent
 
+import be.inniger.advent.util.head
+import be.inniger.advent.util.tail
 import kotlin.Int as Distance
 import kotlin.String as Body
 import kotlin.String as Description
-
-private fun <T> List<T>.head() = first()
-private fun <T> List<T>.tail() = drop(1)
 
 class Day06 {
 

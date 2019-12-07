@@ -1,8 +1,8 @@
 package be.inniger.advent
 
 import kotlin.math.abs
-
-private typealias StepCount = Int
+import kotlin.Int as Coordinate
+import kotlin.Int as StepCount
 
 class Day03 {
 
@@ -48,5 +48,5 @@ class Day03 {
         return positions.toMap()
     }
 
-    private data class Position(val x: Int, val y: Int)
+    private data class Position(val x: Coordinate, val y: Coordinate)
 }

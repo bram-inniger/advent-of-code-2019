@@ -1,7 +1,7 @@
 package be.inniger.advent
 
+import be.inniger.advent.util.generatePermutations
 import be.inniger.advent.util.head
-import be.inniger.advent.util.minusIndex
 import be.inniger.advent.util.pow
 import be.inniger.advent.util.tail
 
@@ -13,17 +13,9 @@ class Day07 {
         private const val LAST_AMP_PHASE = 4
     }
 
-    fun solveFirst(program: IntArray) = getPhasePermutations()
+    fun solveFirst(program: IntArray) = generatePermutations((FIRST_AMP_PHASE..LAST_AMP_PHASE).toList())
         .map { runAmplifiers(program, it) }
         .max()!!
-
-    private fun getPhasePermutations(elements: List<Int> = (FIRST_AMP_PHASE..LAST_AMP_PHASE).toList()): List<List<Int>> =
-        if (elements.isEmpty()) listOf(emptyList())
-        else elements.indices
-            .flatMap { index ->
-                val (element, rest) = elements.minusIndex(index)
-                getPhasePermutations(rest).map { it + element }
-            }
 
     private tailrec fun runAmplifiers(originalProgram: IntArray, phases: List<Int>, output: Int = FIRST_INPUT): Int =
         if (phases.isEmpty()) output

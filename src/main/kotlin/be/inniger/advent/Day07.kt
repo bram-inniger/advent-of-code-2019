@@ -35,10 +35,10 @@ class Day07 {
             when (opcode) {
                 Opcode.ADD -> program[program[pointer + 3]] = arg(1) + arg(2)
                 Opcode.MULTIPLY -> program[program[pointer + 3]] = arg(1) * arg(2)
-                Opcode.INPUT -> program[program[pointer + 1]] = when (nrInputReads++) {
-                    0 -> phase
-                    1 -> input
-                    else -> error("Called input already $nrInputReads")
+                Opcode.INPUT -> program[program[pointer + 1]] = when (++nrInputReads) {
+                    1 -> phase
+                    2 -> input
+                    else -> error("Called input already $nrInputReads times, expected at most 2")
                 }
                 Opcode.OUTPUT -> output = output * 10 + arg(1)
                 Opcode.JT -> if (arg(1) != 0) pointer = arg(2) - opcode.instructionLength

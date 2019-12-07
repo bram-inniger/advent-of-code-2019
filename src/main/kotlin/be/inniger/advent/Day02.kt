@@ -1,61 +1,33 @@
 package be.inniger.advent
 
+import be.inniger.advent.util.runProgram
+
 class Day02 {
 
     companion object {
         private const val DESIRED_OUTPUT = 19690720
     }
 
-    fun solveFirst(program: IntArray, noun: Int = program[1], verb: Int = program[2]) =
-        runProgram(program, noun, verb)
+    fun solveFirst(program: List<Int>, noun: Int = program[1], verb: Int = program[2]) =
+        runProgram(editNounAndVerb(program, Words(noun, verb))).program.first()
 
-    fun solveSecond(program: IntArray): Int {
-        for (noun in 1..99) {
-            for (verb in 1..99) {
-                if (runProgram(program, noun, verb) == DESIRED_OUTPUT) {
-                    return 100 * noun + verb
-                }
-            }
-        }
+    fun solveSecond(program: List<Int>) = generateAllWords()
+        .first { runProgram(editNounAndVerb(program, it)).program.first() == DESIRED_OUTPUT }
+        .let { 100 * it.noun + it.verb }
 
-        throw IllegalArgumentException("No suitable noun and verb found to produce the correct output: $DESIRED_OUTPUT")
+    private fun editNounAndVerb(program: List<Int>, words: Words): List<Int> {
+        val mutableProgram = program.toMutableList()
+
+        mutableProgram[1] = words.noun
+        mutableProgram[2] = words.verb
+
+        return mutableProgram.toList()
     }
 
-    private fun runProgram(originalProgram: IntArray, noun: Int, verb: Int): Int {
-        val program = originalProgram.copyOf()
-        var pointer = 0
-
-        program[1] = noun
-        program[2] = verb
-
-        while (true) {
-            val opcode = OpCode.parse(program[pointer])
-
-            when (opcode) {
-                OpCode.ADD ->
-                    program[program[pointer + 3]] = program[program[pointer + 1]] + program[program[pointer + 2]]
-                OpCode.MULTIPLY ->
-                    program[program[pointer + 3]] = program[program[pointer + 1]] * program[program[pointer + 2]]
-                OpCode.HALT ->
-                    return program[0]
-            }
-
-            pointer += opcode.nrInstructions
+    private fun generateAllWords() =
+        (1..99).flatMap { noun ->
+            (1..99).map { verb -> Words(noun, verb) }
         }
-    }
 
-    private enum class OpCode(val nrInstructions: Int) {
-        ADD(4),
-        MULTIPLY(4),
-        HALT(1);
-
-        companion object {
-            fun parse(opcode: Int) = when (opcode) {
-                1 -> ADD
-                2 -> MULTIPLY
-                99 -> HALT
-                else -> throw IllegalArgumentException()
-            }
-        }
-    }
+    private data class Words(val noun: Int, val verb: Int)
 }

@@ -13,10 +13,7 @@ class Day01 {
     private tailrec fun calculateCompoundFuel(mass: Int, acc: Int = 0): Int {
         val fuel = calculateFuel(mass)
 
-        return if (fuel <= 0) {
-            acc
-        } else {
-            calculateCompoundFuel(fuel, acc + fuel)
-        }
+        return if (fuel <= 0) acc
+        else calculateCompoundFuel(fuel, acc + fuel)
     }
 }

@@ -65,8 +65,8 @@ class Day06 {
             calculateDistancesToCenter(
                 orbitedToOrbiter,
                 orbiterToOrbited,
-                orbitersToVisit.tail().plus(orbitersToAdd),
-                distancesToCenter.plus(orbiter to distanceToCenter)
+                orbitersToVisit.tail() + orbitersToAdd,
+                distancesToCenter + (orbiter to distanceToCenter)
             )
         }
 
@@ -74,7 +74,7 @@ class Day06 {
         orbiterToOrbited: Map<Body, Body>, orbiter: Body?, orbitPath: Set<Body> = setOf()
     ): Set<Body> =
         if (orbiter == null) orbitPath
-        else getOrbitPath(orbiterToOrbited, orbiterToOrbited[orbiter], orbitPath.plus(orbiter))
+        else getOrbitPath(orbiterToOrbited, orbiterToOrbited[orbiter], orbitPath + orbiter)
 
     private data class OrbitRelation(val orbited: Body, val orbiter: Body) {
         companion object {

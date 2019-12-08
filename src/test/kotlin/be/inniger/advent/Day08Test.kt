@@ -18,4 +18,28 @@ class Day08Test {
     fun validateFirstSolution() {
         assertEquals(1560, problem.solveFirst(input))
     }
+
+    @Test
+    fun validateSecondSampleInputs() {
+        assertEquals(
+            listOf(
+                " #",
+                "# "
+            ), problem.solveSecond("0222112222120000", 2, 2)
+        )
+    }
+
+    @Test
+    fun validateSecondSolution() {
+        assertEquals(
+            listOf(
+                "#  #  ##   ##  #  # #  # ",
+                "#  # #  # #  # #  # #  # ",
+                "#  # #    #    #  # #### ",
+                "#  # # ## #    #  # #  # ",
+                "#  # #  # #  # #  # #  # ",
+                " ##   ###  ##   ##  #  # "
+            ), problem.solveSecond(input)
+        )
+    }
 }

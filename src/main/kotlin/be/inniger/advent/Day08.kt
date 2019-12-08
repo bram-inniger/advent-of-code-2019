@@ -1,28 +1,69 @@
 package be.inniger.advent
 
-import kotlin.Int as Count
-import kotlin.Int as Pixel
-
 class Day08 {
 
     companion object {
-        private const val PIXELS_HOR = 25
-        private const val PIXELS_VER = 6
+        private const val DEFAULT_PIXELS_HOR = 25
+        private const val DEFAULT_PIXELS_VER = 6
     }
 
-    fun solveFirst(image: String) = (image.indices step PIXELS_HOR * PIXELS_VER)
-        .map { image.substring(it, it + PIXELS_HOR * PIXELS_VER) }
-        .map { Layer.parse(it) }
-        .minBy { it.pixelCount[0] ?: 0 }
-        .let { (it?.pixelCount?.get(1) ?: 0) * (it?.pixelCount?.get(2) ?: 0) }
+    fun solveFirst(image: String) =
+        readLayers(image, DEFAULT_PIXELS_HOR, DEFAULT_PIXELS_VER)
+            .minBy { it.pixelCount[0] ?: 0 }
+            .let { (it?.pixelCount?.get(1) ?: 0) * (it?.pixelCount?.get(2) ?: 0) }
 
-    private data class Layer(val pixelCount: Map<Pixel, Count>) {
+    fun solveSecond(image: String, pixelsHor: Int = DEFAULT_PIXELS_HOR, pixelsVer: Int = DEFAULT_PIXELS_VER):
+            List<String> {
+        val layers = readLayers(image, pixelsHor, pixelsVer)
+
+        val decoded = (0 until pixelsHor * pixelsVer)
+            .map { index ->
+                layers.first { layer -> layer.pixels[index] != Pixel.TRANSPARENT }.pixels[index]
+            }
+            .map { draw(it) }
+            .joinToString("")
+
+        return (0 until pixelsVer)
+            .map { decoded.substring(it * pixelsHor, it * pixelsHor + pixelsHor) }
+    }
+
+    private fun readLayers(image: String, pixelsHor: Int, pixelsVer: Int) =
+        (image.indices step pixelsHor * pixelsVer)
+            .map { image.substring(it, it + pixelsHor * pixelsVer) }
+            .map { Layer.parse(it) }
+
+    private fun draw(pixel: Pixel) = when (pixel) {
+        Pixel.BLACK -> ' '
+        Pixel.WHITE -> '#'
+        Pixel.TRANSPARENT -> error("Cannot draw transparent pixels")
+    }
+
+    private data class Layer(val pixelCount: Map<Int, Int>, val pixels: List<Pixel>) {
 
         companion object {
-            fun parse(layer: String) = Layer(
-                layer.map { it - '0' }
+            fun parse(layer: String): Layer {
+                val pixelCount = layer.map { it - '0' }
                     .groupingBy { it }
-                    .eachCount())
+                    .eachCount()
+                val pixels = layer.map { Pixel.read(it) }
+
+                return Layer(pixelCount, pixels)
+            }
+        }
+    }
+
+    private enum class Pixel {
+        BLACK,
+        WHITE,
+        TRANSPARENT;
+
+        companion object {
+            fun read(value: Char) = when (value) {
+                '0' -> BLACK
+                '1' -> WHITE
+                '2' -> TRANSPARENT
+                else -> error("Cannot read pixel from value: $value")
+            }
         }
     }
 }

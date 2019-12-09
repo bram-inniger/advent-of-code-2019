@@ -26,7 +26,7 @@ class Day07 {
 
     private tailrec fun runAmplifiers(computers: List<IntComputer>, output: Int = FIRST_INPUT): Int =
         if (computers.isEmpty()) output
-        else runAmplifiers(computers.tail(), computers.head().runProgram(output).output)
+        else runAmplifiers(computers.tail(), computers.head().runProgram(output).output.toInt())
 
     private tailrec fun runAmplifiersWithFeedback(
         computers: List<IntComputer>,
@@ -41,6 +41,6 @@ class Day07 {
             val updatedNrHalts = nrHalts + if (state.halted) 1 else 0
             val nextComputer = (currentComputer + 1) % computers.size
 
-            runAmplifiersWithFeedback(computers, state.output, updatedNrHalts, nextComputer)
+            runAmplifiersWithFeedback(computers, state.output.toInt(), updatedNrHalts, nextComputer)
         }
 }

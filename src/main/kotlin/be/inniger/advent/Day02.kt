@@ -9,10 +9,10 @@ class Day02 {
     }
 
     fun solveFirst(program: List<Int>, noun: Int = program[1], verb: Int = program[2]) =
-        IntComputer(editNounAndVerb(program, Words(noun, verb))).runProgram().firsProgramPosition
+        IntComputer(editNounAndVerb(program, Words(noun, verb))).runProgram().firsPositionValue
 
     fun solveSecond(program: List<Int>) = generateAllWords()
-        .first { IntComputer(editNounAndVerb(program, it)).runProgram().firsProgramPosition == DESIRED_OUTPUT }
+        .first { IntComputer(editNounAndVerb(program, it)).runProgram().firsPositionValue.toInt() == DESIRED_OUTPUT }
         .let { 100 * it.noun + it.verb }
 
     private fun editNounAndVerb(program: List<Int>, words: Words): List<Int> {

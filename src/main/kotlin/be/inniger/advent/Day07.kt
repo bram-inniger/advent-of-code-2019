@@ -1,8 +1,8 @@
 package be.inniger.advent
 
+import be.inniger.advent.util.IntComputer
 import be.inniger.advent.util.generatePermutations
 import be.inniger.advent.util.head
-import be.inniger.advent.util.runProgram
 import be.inniger.advent.util.tail
 
 class Day07 {
@@ -19,5 +19,9 @@ class Day07 {
 
     private tailrec fun runAmplifiers(originalProgram: List<Int>, phases: List<Int>, output: Int = FIRST_INPUT): Int =
         if (phases.isEmpty()) output
-        else runAmplifiers(originalProgram, phases.tail(), runProgram(originalProgram, output, phases.head()).output)
+        else runAmplifiers(
+            originalProgram,
+            phases.tail(),
+            IntComputer(originalProgram, phases.head()).runProgram(output).output
+        )
 }

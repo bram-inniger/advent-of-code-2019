@@ -1,6 +1,6 @@
 package be.inniger.advent
 
-import be.inniger.advent.util.runProgram
+import be.inniger.advent.util.IntComputer
 
 class Day02 {
 
@@ -9,10 +9,10 @@ class Day02 {
     }
 
     fun solveFirst(program: List<Int>, noun: Int = program[1], verb: Int = program[2]) =
-        runProgram(editNounAndVerb(program, Words(noun, verb))).program.first()
+        IntComputer(editNounAndVerb(program, Words(noun, verb))).runProgram().firsProgramPosition
 
     fun solveSecond(program: List<Int>) = generateAllWords()
-        .first { runProgram(editNounAndVerb(program, it)).program.first() == DESIRED_OUTPUT }
+        .first { IntComputer(editNounAndVerb(program, it)).runProgram().firsProgramPosition == DESIRED_OUTPUT }
         .let { 100 * it.noun + it.verb }
 
     private fun editNounAndVerb(program: List<Int>, words: Words): List<Int> {

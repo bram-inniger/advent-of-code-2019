@@ -9,29 +9,29 @@ class IntComputer(originalProgram: List<Int>, private val phase: Int? = null) {
 
     data class State(val output: Int, val firsProgramPosition: Int, val halted: Boolean)
 
-    private val program = originalProgram.toIntArray()
+    private val program = originalProgram.mapIndexed { index, element -> index to element }.toMap().toMutableMap()
     private var pointer = 0
     private var nrInputReads = 0
     private var output = 0
     private var halted = false
 
     fun runProgram(input: Int = DEFAULT_INPUT): State {
-        while (pointer < program.size && !halted) {
-            val instruction = program[pointer]
+        while (!halted) {
+            val instruction = program[pointer] ?: 0
             val opcode = Opcode.parse(instruction % 100)
-            val arg = { argIndex: Int -> (::readArg)(instruction, program, pointer, argIndex) }
+            val arg = { argIndex: Int -> (::readArg)(instruction, pointer, argIndex) }
 
             when (opcode) {
-                Opcode.ADD -> program[program[pointer + 3]] = arg(1) + arg(2)
-                Opcode.MULTIPLY -> program[program[pointer + 3]] = arg(1) * arg(2)
-                Opcode.INPUT -> program[program[pointer + 1]] =
+                Opcode.ADD -> program[program[pointer + 3] ?: 0] = arg(1) + arg(2)
+                Opcode.MULTIPLY -> program[program[pointer + 3] ?: 0] = arg(1) * arg(2)
+                Opcode.INPUT -> program[program[pointer + 1] ?: 0] =
                     if (nrInputReads++ == 0 && phase != null) phase
                     else input
                 Opcode.OUTPUT -> output = arg(1)
                 Opcode.JT -> if (arg(1) != 0) pointer = arg(2) - opcode.instructionLength
                 Opcode.JF -> if (arg(1) == 0) pointer = arg(2) - opcode.instructionLength
-                Opcode.LT -> program[program[pointer + 3]] = if (arg(1) < arg(2)) 1 else 0
-                Opcode.EQ -> program[program[pointer + 3]] = if (arg(1) == arg(2)) 1 else 0
+                Opcode.LT -> program[program[pointer + 3] ?: 0] = if (arg(1) < arg(2)) 1 else 0
+                Opcode.EQ -> program[program[pointer + 3] ?: 0] = if (arg(1) == arg(2)) 1 else 0
                 Opcode.HALT -> halted = true
             }
 
@@ -39,19 +39,20 @@ class IntComputer(originalProgram: List<Int>, private val phase: Int? = null) {
             if (opcode in BREAKING_OPCODES) return currentState()
         }
 
-        if (halted) error("Tried running an already halted program")
-        else error("Pointer at position $pointer is beyond the program of size ${program.size}")
+        error("Tried running an already halted program")
     }
 
-    private fun readArg(instruction: Int, program: IntArray, pointer: Int, argIndex: Int) =
-        if (computeMode(instruction, argIndex) == Mode.POSITION) program[program[pointer + argIndex]]
-        else program[pointer + argIndex]
+    private fun readArg(instruction: Int, pointer: Int, argIndex: Int) =
+        when (computeMode(instruction, argIndex)) {
+            Mode.POSITION -> program[program[pointer + argIndex]] ?: 0
+            Mode.IMMEDIATE -> program[pointer + argIndex] ?: 0
+        }
 
     private fun computeMode(instruction: Int, argIndex: Int) =
         if (instruction / (10 * 10.pow(argIndex)) % 10 == 0) Mode.POSITION
         else Mode.IMMEDIATE
 
-    private fun currentState() = State(output, program.first(), halted)
+    private fun currentState() = State(output, program[0] ?: 0, halted)
 
     private enum class Opcode(val instructionLength: Int) {
         ADD(4),

@@ -4,7 +4,14 @@ import be.inniger.advent.util.IntComputer
 
 class Day09 {
 
-    fun solveFirst(program: List<Long>, computerInput: Int) = runProgramUtilEnd(IntComputer(program), computerInput)
+    companion object {
+        private const val TEST_MODE = 1
+        private const val BOOST_MODE = 2
+    }
+
+    fun solveFirst(program: List<Long>) = runProgramUtilEnd(IntComputer(program), TEST_MODE)
+
+    fun solveSecond(program: List<Long>) = runProgramUtilEnd(IntComputer(program), BOOST_MODE)
 
     private tailrec fun runProgramUtilEnd(
         computer: IntComputer, computerInput: Int, output: List<Long> = listOf()

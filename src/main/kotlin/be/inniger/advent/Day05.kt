@@ -9,9 +9,9 @@ class Day05 {
         private const val RADIATOR_ID = 5
     }
 
-    fun solveFirst(program: List<Int>, input: Int = CONDITIONER_ID) = runUntilHalt(IntComputer(program), input)
+    fun solveFirst(program: List<Long>, input: Int = CONDITIONER_ID) = runUntilHalt(IntComputer(program), input)
 
-    fun solveSecond(program: List<Int>, input: Int = RADIATOR_ID) = runUntilHalt(IntComputer(program), input)
+    fun solveSecond(program: List<Long>, input: Int = RADIATOR_ID) = runUntilHalt(IntComputer(program), input)
 
     private tailrec fun runUntilHalt(computer: IntComputer, input: Int, output: String = "0", halted: Boolean = false): Int =
         if (halted) output.toInt()

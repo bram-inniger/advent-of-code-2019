@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class Day05Test {
 
     private val problem = Day05()
-    private val input = readInputFile("05")[0].split(",").map { it.toInt() }
+    private val input = readInputFile("05")[0].split(",").map { it.toLong() }
 
     @Test
     fun validateFirstSampleInputs() {

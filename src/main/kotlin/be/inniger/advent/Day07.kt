@@ -11,17 +11,17 @@ class Day07 {
         private const val FIRST_INPUT = 0
     }
 
-    fun solveFirst(program: List<Int>) = generatePermutations((0..4).toList())
+    fun solveFirst(program: List<Long>) = generatePermutations((0..4).toList())
         .map { createComputers(program, it) }
         .map { runAmplifiers(it) }
         .max()!!
 
-    fun solveSecond(program: List<Int>) = generatePermutations((5..9).toList())
+    fun solveSecond(program: List<Long>) = generatePermutations((5..9).toList())
         .map { createComputers(program, it) }
         .map { runAmplifiersWithFeedback(it) }
         .max()!!
 
-    private fun createComputers(program: List<Int>, phases: List<Int>) =
+    private fun createComputers(program: List<Long>, phases: List<Int>) =
         phases.map { phase -> IntComputer(program, phase) }
 
     private tailrec fun runAmplifiers(computers: List<IntComputer>, output: Int = FIRST_INPUT): Int =

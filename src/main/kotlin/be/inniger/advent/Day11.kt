@@ -4,25 +4,28 @@ import be.inniger.advent.util.IntComputer
 
 class Day11 {
 
-    fun solveFirst(program: List<Long>): Int {
+    fun solveFirst(program: List<Long>) = solve(program).paintedPanels.size
+
+    fun solveSecond(program: List<Long>) = printRegistration(solve(program, mutableSetOf(Coordinate(0, 0))).whitePanels)
+
+    private fun solve(program: List<Long>, whitePanels: MutableSet<Coordinate> = mutableSetOf()): PaintJob {
         val computer = IntComputer(program)
         val paintedPanels = mutableSetOf<Coordinate>()
-        val whitePanels = mutableSetOf<Coordinate>()
 
-        var colour: Int
+        var colour: Colour
         var coordinate = Coordinate(0, 0)
         var direction = Direction.NORTH
 
         while (true) {
-            colour = if (whitePanels.contains(coordinate)) 1 else 0
+            colour = readColour(coordinate, whitePanels)
 
-            val state = computer.runProgram(colour)
-            if (state.halted) return paintedPanels.size
+            val state = computer.runProgram(colour.number)
+            if (state.halted) return PaintJob(paintedPanels, whitePanels)
 
             direction = turn(direction, computer.runProgram(-1).output.toInt())
 
             paintedPanels.add(coordinate)
-            if (state.output.toInt() == 0) {
+            if (readColour(state) == Colour.BLACK) {
                 whitePanels.remove(coordinate)
             } else {
                 whitePanels.add(coordinate)
@@ -49,18 +52,40 @@ class Day11 {
             else -> error("Cannot turn on signal: $turnSignal")
         }
 
-    private fun move(position: Coordinate, direction: Direction) =
+    private fun move(coordinate: Coordinate, direction: Direction) =
         when (direction) {
-            Direction.NORTH -> Coordinate(position.x, position.y + 1)
-            Direction.EAST -> Coordinate(position.x + 1, position.y)
-            Direction.SOUTH -> Coordinate(position.x, position.y - 1)
-            Direction.WEST -> Coordinate(position.x - 1, position.y)
+            Direction.NORTH -> Coordinate(coordinate.x, coordinate.y - 1)
+            Direction.EAST -> Coordinate(coordinate.x + 1, coordinate.y)
+            Direction.SOUTH -> Coordinate(coordinate.x, coordinate.y + 1)
+            Direction.WEST -> Coordinate(coordinate.x - 1, coordinate.y)
         }
+
+    private fun readColour(coordinate: Coordinate, whitePanels: Set<Coordinate>) =
+        if (whitePanels.contains(coordinate)) Colour.WHITE
+        else Colour.BLACK
+
+    private fun readColour(state: IntComputer.State) =
+        if (state.output == 0L) Colour.BLACK
+        else Colour.WHITE
+
+    private fun printRegistration(whitePanels: Set<Coordinate>): String {
+        val minX = whitePanels.minBy { it.x }!!.x
+        val maxX = whitePanels.maxBy { it.x }!!.x
+        val minY = whitePanels.minBy { it.y }!!.y
+        val maxY = whitePanels.maxBy { it.y }!!.y
+
+        return (minY..maxY).joinToString("\n") { y ->
+            (minX..maxX).map { x -> if (whitePanels.contains(Coordinate(x, y))) '#' else ' ' }.joinToString("")
+        }
+    }
 
     private data class Coordinate(val x: Int, val y: Int)
 
-    private enum class Colour {
-        BLACK, WHITE
+    private data class PaintJob(val paintedPanels: Set<Coordinate>, val whitePanels: Set<Coordinate>)
+
+    private enum class Colour(val number: Int) {
+        BLACK(0),
+        WHITE(1)
     }
 
     private enum class Direction {

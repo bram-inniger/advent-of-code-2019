@@ -31,4 +31,24 @@ class Day11Test {
     fun validateFirstSolution() {
         assertEquals(2211, problem.solveFirst(input))
     }
+
+    @Test
+    fun validateSecondSampleInputs() {
+        // No sample inputs given
+    }
+
+    @Test
+    fun validateSecondSolution() {
+        val registration =
+            """
+                #### ####  ##  #  # #  # ####  ##   ## 
+                #    #    #  # # #  #  # #    #  # #  #
+                ###  ###  #    ##   #  # ###  #    #   
+                #    #    #    # #  #  # #    # ## #   
+                #    #    #  # # #  #  # #    #  # #  #
+                #### #     ##  #  #  ##  ####  ###  ## 
+            """.trimIndent()
+
+        assertEquals(registration, problem.solveSecond(input))
+    }
 }

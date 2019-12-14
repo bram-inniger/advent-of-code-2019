@@ -25,11 +25,8 @@ class Day11 {
             direction = turn(direction, computer.runProgram(-1).output.toInt())
 
             paintedPanels.add(coordinate)
-            if (readColour(state) == Colour.BLACK) {
-                whitePanels.remove(coordinate)
-            } else {
-                whitePanels.add(coordinate)
-            }
+            if (readColour(state) == Colour.BLACK) whitePanels.remove(coordinate)
+            else whitePanels.add(coordinate)
 
             coordinate = move(coordinate, direction)
         }

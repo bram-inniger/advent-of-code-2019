@@ -1,5 +1,6 @@
 package be.inniger.advent
 
+import be.inniger.advent.util.lcm
 import kotlin.math.abs
 
 class Day12 {
@@ -12,6 +13,45 @@ class Day12 {
         }
 
         return moons.map { energy(it) }.sum()
+    }
+
+    fun solveSecond(moonDescriptions: List<String>): Long {
+        val orig = moonDescriptions.map { Moon.parse(it) }
+        var moons = moonDescriptions.map { Moon.parse(it) }
+        var xPeriod = 0
+        var yPeriod = 0
+        var zPeriod = 0
+
+        for (i in 1..Int.MAX_VALUE) {
+            moons = moons.map { gravity(it, moons) }.map { move(it) }
+            if (moons.indices.all {
+                    moons[it].position.x == orig[it].position.x &&
+                            moons[it].velocity.x == orig[it].velocity.x &&
+                            xPeriod == 0
+                }) {
+                xPeriod = i
+            }
+            if (moons.indices.all {
+                    moons[it].position.y == orig[it].position.y &&
+                            moons[it].velocity.y == orig[it].velocity.y &&
+                            yPeriod == 0
+                }) {
+                yPeriod = i
+            }
+            if (moons.indices.all {
+                    moons[it].position.z == orig[it].position.z &&
+                            moons[it].velocity.z == orig[it].velocity.z &&
+                            zPeriod == 0
+                }) {
+                zPeriod = i
+            }
+
+            if (xPeriod != 0 && yPeriod != 0 && zPeriod != 0) {
+                return lcm(xPeriod.toLong(), lcm(yPeriod.toLong(), zPeriod.toLong()))
+            }
+        }
+
+        error("")
     }
 
     // TODO cleanup

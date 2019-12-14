@@ -1,6 +1,6 @@
 package be.inniger.advent
 
-import kotlin.math.abs
+import be.inniger.advent.util.gcd
 import kotlin.math.atan2
 
 class Day10 {
@@ -45,23 +45,6 @@ class Day10 {
             .distinct()
             .count()
             .let { Visibility(asteroid, it) }
-
-    private fun gcd(a: Int, b: Int): Int {
-        if (a == 0 && b == 0) return 1
-
-        var absA = abs(a)
-        var absB = abs(b)
-
-        if (absA == 0) return absB
-        if (absB == 0) return absA
-
-        while (absA != absB) {
-            if (absA > absB) absA -= absB
-            else absB -= absA
-        }
-
-        return absA
-    }
 
     private fun angle(asteroid: Asteroid) = -atan2(asteroid.x.toDouble(), asteroid.y.toDouble())
 

@@ -16,78 +16,38 @@ class Day12 {
     }
 
     fun solveSecond(moonDescriptions: List<String>): Long {
-        val orig = moonDescriptions.map { Moon.parse(it) }
-        var moons = moonDescriptions.map { Moon.parse(it) }
+        val originalMoons = moonDescriptions.map { Moon.parse(it) }
+        val backAtOrigin = { currentMoons: List<Moon>,
+                             positionExtractor: (Position) -> Int,
+                             velocityExtractor: (Velocity) -> Int ->
+            (::isBackAt)(originalMoons, currentMoons, positionExtractor, velocityExtractor)
+        }
+
+        var currentMoons = moonDescriptions.map { Moon.parse(it) }
         var xPeriod = 0
         var yPeriod = 0
         var zPeriod = 0
+        var index = 1
 
-        for (i in 1..Int.MAX_VALUE) {
-            moons = moons.map { gravity(it, moons) }.map { move(it) }
-            if (moons.indices.all {
-                    moons[it].position.x == orig[it].position.x &&
-                            moons[it].velocity.x == orig[it].velocity.x &&
-                            xPeriod == 0
-                }) {
-                xPeriod = i
-            }
-            if (moons.indices.all {
-                    moons[it].position.y == orig[it].position.y &&
-                            moons[it].velocity.y == orig[it].velocity.y &&
-                            yPeriod == 0
-                }) {
-                yPeriod = i
-            }
-            if (moons.indices.all {
-                    moons[it].position.z == orig[it].position.z &&
-                            moons[it].velocity.z == orig[it].velocity.z &&
-                            zPeriod == 0
-                }) {
-                zPeriod = i
-            }
+        while (true) {
+            currentMoons = currentMoons.map { gravity(it, currentMoons) }.map { move(it) }
+
+            if (backAtOrigin(currentMoons, { it.x }, { it.x }) && xPeriod == 0) xPeriod = index
+            if (backAtOrigin(currentMoons, { it.y }, { it.y }) && yPeriod == 0) yPeriod = index
+            if (backAtOrigin(currentMoons, { it.z }, { it.z }) && zPeriod == 0) zPeriod = index
 
             if (xPeriod != 0 && yPeriod != 0 && zPeriod != 0) {
                 return lcm(xPeriod.toLong(), lcm(yPeriod.toLong(), zPeriod.toLong()))
             }
-        }
 
-        error("")
+            index++
+        }
     }
 
-    // TODO cleanup
     private fun gravity(moon: Moon, moons: List<Moon>): Moon {
-        val xChange = moons.map { it.position.x }
-            .map {
-                when {
-                    it > moon.position.x -> +1
-                    it == moon.position.x -> 0
-                    it < moon.position.x -> -1
-                    else -> error("Not mathematically possible")
-                }
-            }
-            .sum()
-
-        val yChange = moons.map { it.position.y }
-            .map {
-                when {
-                    it > moon.position.y -> +1
-                    it == moon.position.y -> 0
-                    it < moon.position.y -> -1
-                    else -> error("Not mathematically possible")
-                }
-            }
-            .sum()
-
-        val zChange = moons.map { it.position.z }
-            .map {
-                when {
-                    it > moon.position.z -> +1
-                    it == moon.position.z -> 0
-                    it < moon.position.z -> -1
-                    else -> error("Not mathematically possible")
-                }
-            }
-            .sum()
+        val xChange = gravityChange(moon, moons) { it.x }
+        val yChange = gravityChange(moon, moons) { it.y }
+        val zChange = gravityChange(moon, moons) { it.z }
 
         val vel = moon.velocity
         return Moon(moon.position, Velocity(vel.x + xChange, vel.y + yChange, vel.z + zChange))
@@ -106,6 +66,28 @@ class Day12 {
 
         return (abs(pos.x) + abs(pos.y) + abs(pos.z)) *
                 (abs(vel.x) + abs(vel.y) + abs(vel.z))
+    }
+
+    private fun gravityChange(moon: Moon, moons: List<Moon>, positionExtractor: (Position) -> Int) =
+        moons.map { it.position.z }
+            .map {
+                when {
+                    it > positionExtractor(moon.position) -> +1
+                    it == positionExtractor(moon.position) -> 0
+                    it < positionExtractor(moon.position) -> -1
+                    else -> error("Not mathematically possible")
+                }
+            }
+            .sum()
+
+    private fun isBackAt(
+        pointsOfReturn: List<Moon>,
+        currentMoons: List<Moon>,
+        positionExtractor: (Position) -> Int,
+        velocityExtractor: (Velocity) -> Int
+    ) = currentMoons.indices.all {
+        positionExtractor(currentMoons[it].position) == positionExtractor(pointsOfReturn[it].position) &&
+                velocityExtractor(currentMoons[it].velocity) == velocityExtractor(pointsOfReturn[it].velocity)
     }
 
     private data class Moon(val position: Position, val velocity: Velocity) {
